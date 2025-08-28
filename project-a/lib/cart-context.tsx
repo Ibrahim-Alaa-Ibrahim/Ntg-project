@@ -28,7 +28,7 @@ type CartAction =
   | { type: "UPDATE_QUANTITY"; payload: { id: number; quantity: number } }
   | { type: "CLEAR_CART" };
 
-interface AddItemPayload {
+export interface AddItemPayload {
   id: number;
   name: string;
   price: number;
@@ -59,14 +59,12 @@ function cartReducer(state: CartState, action: CartAction): CartState {
       const itemCount = items.reduce((s, i) => s + i.quantity, 0);
       return { items, total, itemCount };
     }
-
     case "REMOVE_ITEM": {
       const items = state.items.filter((i) => i.id !== action.payload);
       const total = items.reduce((s, i) => s + i.price * i.quantity, 0);
       const itemCount = items.reduce((s, i) => s + i.quantity, 0);
       return { items, total, itemCount };
     }
-
     case "UPDATE_QUANTITY": {
       const items = state.items
         .map((i) =>
@@ -77,10 +75,8 @@ function cartReducer(state: CartState, action: CartAction): CartState {
       const itemCount = items.reduce((s, i) => s + i.quantity, 0);
       return { items, total, itemCount };
     }
-
     case "CLEAR_CART":
       return { items: [], total: 0, itemCount: 0 };
-
     default:
       return state;
   }
@@ -89,7 +85,7 @@ function cartReducer(state: CartState, action: CartAction): CartState {
 export function CartProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(cartReducer, { items: [], total: 0, itemCount: 0 });
 
-  // Keep the helper signature used by pages: { id, name, price, qty }
+  // Keep the helper signature used across the app: { id, name, price, qty }
   const addItem = (item: AddItemPayload) => {
     dispatch({
       type: "ADD_ITEM",
