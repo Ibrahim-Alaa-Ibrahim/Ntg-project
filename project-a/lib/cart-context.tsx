@@ -45,9 +45,9 @@ const CartContext = createContext<{
 function cartReducer(state: CartState, action: CartAction): CartState {
   switch (action.type) {
     case "ADD_ITEM": {
-      const existing = state.items.find(i => i.id === action.payload.id);
+      const existing = state.items.find((i) => i.id === action.payload.id);
       if (existing) {
-        const items = state.items.map(i =>
+        const items = state.items.map((i) =>
           i.id === action.payload.id ? { ...i, quantity: i.quantity + 1 } : i
         );
         const total = items.reduce((s, i) => s + i.price * i.quantity, 0);
@@ -61,7 +61,7 @@ function cartReducer(state: CartState, action: CartAction): CartState {
     }
 
     case "REMOVE_ITEM": {
-      const items = state.items.filter(i => i.id !== action.payload);
+      const items = state.items.filter((i) => i.id !== action.payload);
       const total = items.reduce((s, i) => s + i.price * i.quantity, 0);
       const itemCount = items.reduce((s, i) => s + i.quantity, 0);
       return { items, total, itemCount };
@@ -69,8 +69,10 @@ function cartReducer(state: CartState, action: CartAction): CartState {
 
     case "UPDATE_QUANTITY": {
       const items = state.items
-        .map(i => (i.id === action.payload.id ? { ...i, quantity: action.payload.quantity } : i))
-        .filter(i => i.quantity > 0);
+        .map((i) =>
+          i.id === action.payload.id ? { ...i, quantity: action.payload.quantity } : i
+        )
+        .filter((i) => i.quantity > 0);
       const total = items.reduce((s, i) => s + i.price * i.quantity, 0);
       const itemCount = items.reduce((s, i) => s + i.quantity, 0);
       return { items, total, itemCount };
@@ -87,7 +89,7 @@ function cartReducer(state: CartState, action: CartAction): CartState {
 export function CartProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(cartReducer, { items: [], total: 0, itemCount: 0 });
 
-  // Keep the helper signature used by your pages: { id, name, price, qty }
+  // Keep the helper signature used by pages: { id, name, price, qty }
   const addItem = (item: AddItemPayload) => {
     dispatch({
       type: "ADD_ITEM",

@@ -59,8 +59,9 @@ export default function CoursePage({ params }: { params: Promise<{ id: string }>
   if (error) return <div className="p-6 text-red-600">Error: {error}</div>;
   if (!course) return <div className="p-6">Course not found.</div>;
 
-  const courseData = mapApiCourseToVM(course);
-  const isInCart = state.items.some((item) => item.id === courseData.id);
+    const courseData = mapApiCourseToVM(course);
+    // Check if this course is already in the cart
+    const isInCart = state.items?.some((item) => item.id === courseData.id) ?? false;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -134,9 +135,13 @@ export default function CoursePage({ params }: { params: Promise<{ id: string }>
               <CardDescription>Lifetime access • Certificate included</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <Button className="w-full"
-                onClick={() => addItem({ id: courseData.id, name: courseData.title, price: courseData.price, qty: 1 })}
-                disabled={isInCart}>
+              <Button
+                className="w-full"
+                disabled={isInCart}
+                onClick={() =>
+                  addItem({ id: courseData.id, name: courseData.title, price: courseData.price, qty: 1 })
+                }
+              >
                 {isInCart ? "Already in Cart" : "Add to Cart"}
               </Button>
 
