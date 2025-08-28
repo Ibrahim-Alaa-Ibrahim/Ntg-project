@@ -29,9 +29,17 @@ type CartAction =
   | { type: "UPDATE_QUANTITY"; payload: { id: number; quantity: number } }
   | { type: "CLEAR_CART" }
 
+interface AddItemPayload {
+  id: number
+  name: string
+  price: number
+  qty: number
+}
+
 const CartContext = createContext<{
   state: CartState
   dispatch: React.Dispatch<CartAction>
+  addItem: (item: AddItemPayload) => void
 } | null>(null)
 
 function cartReducer(state: CartState, action: CartAction): CartState {
@@ -92,7 +100,21 @@ export function CartProvider({ children }: { children: ReactNode }) {
     itemCount: 0,
   })
 
-  return <CartContext.Provider value={{ state, dispatch }}>{children}</CartContext.Provider>
+  const addItem = (item: AddItemPayload) => {
+    dispatch({
+      type: "ADD_ITEM",
+      payload: {
+        id: item.id,
+        title: item.name,
+        price: item.price,
+        image: "",
+        instructor: "",
+        duration: "",
+      },
+    })
+  }
+
+  return <CartContext.Provider value={{ state, dispatch, addItem }}>{children}</CartContext.Provider>
 }
 
 export function useCart() {
