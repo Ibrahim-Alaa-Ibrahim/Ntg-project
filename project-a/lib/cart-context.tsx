@@ -6,11 +6,12 @@ import { createContext, useContext, useReducer, type ReactNode } from "react"
 
 interface Course {
   id: number
-  title: string
+  title?: string
   price: number
-  image: string
-  instructor: string
-  duration: string
+  image?: string
+  instructor?: string
+  duration?: string
+  [key: string]: unknown
 }
 
 interface CartItem extends Course {
@@ -32,6 +33,7 @@ type CartAction =
 const CartContext = createContext<{
   state: CartState
   dispatch: React.Dispatch<CartAction>
+  addItem: (payload: Course) => void
 } | null>(null)
 
 function cartReducer(state: CartState, action: CartAction): CartState {
@@ -92,7 +94,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
     itemCount: 0,
   })
 
-  return <CartContext.Provider value={{ state, dispatch }}>{children}</CartContext.Provider>
+  const addItem = (payload: Course) => dispatch({ type: "ADD_ITEM", payload })
+
+  return <CartContext.Provider value={{ state, dispatch, addItem }}>{children}</CartContext.Provider>
 }
 
 export function useCart() {
@@ -100,5 +104,6 @@ export function useCart() {
   if (!context) {
     throw new Error("useCart must be used within a CartProvider")
   }
-  return context
+  const { state, dispatch, addItem } = context
+  return { state, dispatch, addItem }
 }
