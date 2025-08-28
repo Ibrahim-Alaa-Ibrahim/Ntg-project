@@ -10,8 +10,6 @@ import { Badge } from "@/components/ui/badge";
 import { Clock, Users, Star, Award, BookOpen, ArrowLeft, ShieldCheck, Globe, Lock, CheckCircle } from "lucide-react";
 import Link from "next/link";
 
-type PageProps = { params: { id: string } };
-
 function mapApiCourseToVM(c: ApiCourse) {
   return {
     id: c.id,
@@ -34,30 +32,36 @@ function mapApiCourseToVM(c: ApiCourse) {
   };
 }
 
-export default function CoursePage({ params }: PageProps) {
-  const id = Number(params.id);
-  const { state, addItem } = useCart();
+export default function CoursePage({ params }: { params: Promise<{ id: string }> }) {
+  const [id, setId] = useState<number | null>(null)
+  const { state, addItem } = useCart()
 
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [course, setCourse] = useState<ApiCourse | null>(null);
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [course, setCourse] = useState<ApiCourse | null>(null)
 
   useEffect(() => {
-    if (!id) return;
-    setLoading(true);
-    setError(null);
-    api.getCourse(id)
+    params.then((p) => setId(Number(p.id)))
+  }, [params])
+
+  useEffect(() => {
+    if (!id) return
+    setLoading(true)
+    setError(null)
+    api
+      .getCourse(id)
       .then(setCourse)
       .catch((e) => setError(e?.message ?? "Failed to load course"))
-      .finally(() => setLoading(false));
-  }, [id]);
+      .finally(() => setLoading(false))
+  }, [id])
 
   if (loading) return <div className="p-6">Loading course…</div>;
   if (error) return <div className="p-6 text-red-600">Error: {error}</div>;
   if (!course) return <div className="p-6">Course not found.</div>;
 
-  const courseData = mapApiCourseToVM(course);
-  const isInCart = state.items.some((item) => item.id === courseData.id);
+    const courseData = mapApiCourseToVM(course);
+    // Check if this course is already in the cart
+    const isInCart = state.items?.some((item) => item.id === courseData.id) ?? false;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -131,9 +135,13 @@ export default function CoursePage({ params }: PageProps) {
               <CardDescription>Lifetime access • Certificate included</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <Button className="w-full"
-                onClick={() => addItem({ id: courseData.id, name: courseData.title, price: courseData.price, qty: 1 })}
-                disabled={isInCart}>
+              <Button
+                className="w-full"
+                disabled={isInCart}
+                onClick={() =>
+                  addItem({ id: courseData.id, name: courseData.title, price: courseData.price, qty: 1 })
+                }
+              >
                 {isInCart ? "Already in Cart" : "Add to Cart"}
               </Button>
 
