@@ -1,49 +1,74 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
+import {
+  auth,
+  type LoginInput,
+  type RegisterInput,
+  type AuthUser,
+  type LoginResponse,
+} from "./auth";
 
-type AuthState = {
-  token: string | null;
-  user: any | null;
-};
-
-type AuthContextType = AuthState & {
-  setAuth: (s: AuthState) => void;
+type AuthContextValue = {
+  user: AuthUser | null;
+  loading: boolean;
+  login: (input: LoginInput) => Promise<void>;
+  register: (input: RegisterInput) => Promise<void>;
   logout: () => void;
 };
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [token, setToken] = useState<string | null>(null);
-  const [user, setUser] = useState<any | null>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const saved = typeof window !== "undefined" ? window.localStorage.getItem("auth") : null;
-    if (saved) {
+    const raw = localStorage.getItem("auth");
+    if (raw) {
       try {
-        const parsed = JSON.parse(saved);
-        setToken(parsed.token || null);
-        setUser(parsed.user || null);
-      } catch {/* ignore */}
+        const parsed: LoginResponse = JSON.parse(raw);
+        setUser(parsed.user);
+      } catch {}
     }
   }, []);
 
-  const setAuth = (s: AuthState) => {
-    setToken(s.token);
-    setUser(s.user);
-    if (typeof window !== "undefined") window.localStorage.setItem("auth", JSON.stringify(s));
-  };
+  async function login(input: LoginInput) {
+    setLoading(true);
+    try {
+      const res = await auth.login(input);
+      localStorage.setItem("token", res.token);
+      localStorage.setItem("auth", JSON.stringify(res));
+      setUser(res.user);
+    } finally {
+      setLoading(false);
+    }
+  }
 
-  const logout = () => setAuth({ token: null, user: null });
+  async function register(input: RegisterInput) {
+    setLoading(true);
+    try {
+      await auth.register(input);
+    } finally {
+      setLoading(false);
+    }
+  }
 
-  const value = useMemo(() => ({ token, user, setAuth, logout }), [token, user]);
+  function logout() {
+    localStorage.removeItem("token");
+    localStorage.removeItem("auth");
+    setUser(null);
+  }
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
 }
 
 export function useAuth() {
   const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error("useAuth must be used within <AuthProvider>");
+  if (!ctx) throw new Error("useAuth must be used within AuthProvider");
   return ctx;
 }
