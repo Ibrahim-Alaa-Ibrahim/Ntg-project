@@ -1,19 +1,19 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/lib/auth-context';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
+import { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/lib/auth-context";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 
 export default function RegisterPage() {
   const router = useRouter();
   const { register, loading } = useAuth();
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
 
   async function onSubmit(e: React.FormEvent) {
@@ -21,9 +21,9 @@ export default function RegisterPage() {
     setError(null);
     try {
       await register({ name, email, password });
-      router.push('/login');
+      router.push("/login");
     } catch (err: any) {
-      setError(err?.message ?? 'Registration failed');
+      setError(err?.message ?? "Registration failed");
     }
   }
 
@@ -47,7 +47,7 @@ export default function RegisterPage() {
             <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
           </div>
           <Button type="submit" disabled={loading} className="w-full">
-            {loading ? 'Creating...' : 'Create Account'}
+            {loading ? "Creating..." : "Create Account"}
           </Button>
         </form>
 
