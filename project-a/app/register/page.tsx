@@ -309,28 +309,45 @@ export default function RegisterPage() {
                   >
                     Back
                   </Button>
-                  \1
-            onClick={async () => {
-              setError(null); setSubmitting(true);
-              try {
-                const name = `${parentData.firstName} ${parentData.lastName}`.trim();
-                await auth.register({ name, email: parentData.email, password: parentData.password });
-                // try auto-login
-                try {
-                  const loginRes = await auth.login({ email: parentData.email, password: parentData.password });
-                  if (loginRes?.token) {
-                    window.localStorage.setItem("auth", JSON.stringify({ token: loginRes.token, user: loginRes.user || null }));
-                  }
-                }} catch (e) {{ /* ignore login error, continue */ }}
-                router.push("/login");
-              }} catch (e: any) {{
-                setError(e?.message || "Registration failed");
-              }} finally {{
-                setSubmitting(false);
-              }}
-            }}
-          >
-            {{submitting ? "Creating..." : "Create Account"}}
+                  <Button
+                    className="flex-1 rounded-xl bg-blue-600 text-white hover:bg-blue-700"
+                    onClick={async () => {
+                      setError(null)
+                      setSubmitting(true)
+                      try {
+                        const name = `${parentData.firstName} ${parentData.lastName}`.trim()
+                        await auth.register({
+                          name,
+                          email: parentData.email,
+                          password: parentData.password,
+                        })
+                        // try auto-login
+                        try {
+                          const loginRes = await auth.login({
+                            email: parentData.email,
+                            password: parentData.password,
+                          })
+                          if (loginRes?.token) {
+                            window.localStorage.setItem(
+                              "auth",
+                              JSON.stringify({
+                                token: loginRes.token,
+                                user: loginRes.user || null,
+                              }),
+                            )
+                          }
+                        } catch (e) {
+                          /* ignore login error, continue */
+                        }
+                        router.push("/login")
+                      } catch (e: any) {
+                        setError(e?.message || "Registration failed")
+                      } finally {
+                        setSubmitting(false)
+                      }
+                    }}
+                  >
+                    {submitting ? "Creating..." : "Create Account"}
                   </Button>
                 </div>
               </div>
