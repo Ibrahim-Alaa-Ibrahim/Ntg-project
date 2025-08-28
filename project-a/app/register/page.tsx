@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useState } from "react";
 import Link from "next/link";
@@ -13,7 +13,8 @@ export default function RegisterPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log({ name, email });
+    // TODO: wire to real API later
+    console.log({ name, email, password });
   };
 
   return (
@@ -24,11 +25,7 @@ export default function RegisterPage() {
         <form onSubmit={handleSubmit} className="rounded-lg border p-6 bg-white space-y-4">
           <div className="space-y-2">
             <Label htmlFor="name">Name</Label>
-            <Input
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
+            <Input id="name" value={name} onChange={(e) => setName(e.target.value)} />
           </div>
 
           <div className="space-y-2">
