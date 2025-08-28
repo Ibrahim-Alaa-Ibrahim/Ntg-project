@@ -3,6 +3,7 @@ import type { Metadata } from "next"
 import { Fredoka, Inter } from "next/font/google"
 import "./globals.css"
 import { CartProvider } from "@/lib/cart-context"
+import { AuthProvider } from "@/lib/auth-context"
 
 const fredoka = Fredoka({
   subsets: ["latin"],
@@ -31,7 +32,9 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${fredoka.variable} ${inter.variable}`}>
       <body className="font-sans antialiased">
-        <CartProvider><AuthProvider>{children}</AuthProvider></CartProvider>
+        <CartProvider>
+          <AuthProvider>{children}</AuthProvider>
+        </CartProvider>
       </body>
     </html>
   )
